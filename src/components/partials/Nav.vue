@@ -12,10 +12,6 @@
                 <font-awesome-icon class="icon" :icon="['fas', 'home']"/>
                 <router-link to="/">Home</router-link>
             </div>
-            <div>
-                <font-awesome-icon class="icon" :icon="['fas', 'id-card']"/>
-                <router-link to="/about">About</router-link>
-            </div>
             <v-card>
                 <div v-if="!$auth.loading">
                     <a v-if="!$auth.isAuthenticated" @click="login"><strong>Sign in</strong></a>
