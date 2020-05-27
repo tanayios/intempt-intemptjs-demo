@@ -1,0 +1,4 @@
+{
+  "ContentType": "application/x-www-form-urlencoded",
+  "Authorization": secrets.STRIPE_AUTH
+}
