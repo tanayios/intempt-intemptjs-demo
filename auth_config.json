@@ -1,0 +1,4 @@
+{
+  "domain": secrets.AUTH0_DOMAIN,
+  "clientId": secrets.AUTH0_CLIENTID
+}
