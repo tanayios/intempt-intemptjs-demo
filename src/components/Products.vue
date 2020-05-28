@@ -10,7 +10,7 @@
             <v-card-subtitle class="product-subtitle">{{product.description}}</v-card-subtitle>
             <v-card-text class="product-address">
                 <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" style="margin-right: 5px"/>
-                Luetzowufer 15 Berlin, Germany 10785
+                {{product.metadata.address}}
             </v-card-text>
             <v-spacer></v-spacer>
             <v-divider></v-divider>
