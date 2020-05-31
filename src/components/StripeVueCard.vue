@@ -8,9 +8,13 @@
                 @token="tokenCreated"
                 @loading="loading = $event"
         >
-            <template slot="payment-form">
-                <input id="name" name="name" placeholder="Jenny Rosen" required>
+
+
+            <template slot="ideal-bank-element">
+
             </template>
+
+
         </stripe-elements>
     </div>
 </template>
@@ -25,6 +29,12 @@
     export default {
         components: {
             StripeElements
+        },
+        props: {
+            cardOptions: {
+                type: Object,
+                default: () => ({})
+            }
         },
         data: () => ({
             loading: false,

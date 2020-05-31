@@ -2,10 +2,10 @@
   <div class="home">
     <section>
         <h1>
-          Intempt Demo Shop
+          Intempt Hotel Demo
         </h1>
         <h2>
-          Book a room
+          Book a Room
         </h2>
       <products></products>
     </section>

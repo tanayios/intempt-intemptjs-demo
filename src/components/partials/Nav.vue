@@ -5,13 +5,10 @@
         dark
         height="50"
     >
-        <img src="https://app.intempt.com/img/intempt_logo_white.0f3a5341.svg">
-        <v-divider vertical></v-divider>
         <v-layout justify-space-between>
-            <div>
-                <font-awesome-icon class="icon" :icon="['fas', 'home']"/>
-                <router-link to="/">Home</router-link>
-            </div>
+            <router-link to="/">
+                <img src="https://app.intempt.com/img/intempt_logo_white.0f3a5341.svg">
+            </router-link>
             <v-card>
                 <div v-if="!$auth.loading">
                     <a v-if="!$auth.isAuthenticated" @click="login"><strong>Sign in</strong></a>
