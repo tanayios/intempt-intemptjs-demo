@@ -943,6 +943,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@chaitin/querystring@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@chaitin/querystring/-/querystring-1.1.0.tgz#e5c29e5bb506fe92781405f7d1773fd01b838085"
+  integrity sha512-3YXFzaJxX7dnCPaxWnfaw5/A99qVrj92lTLVdJyqvXd0LY4I4t2ql3LKIayj/eNNssX2lKuFzmqBh7pV/VyNBA==
+
 "@endemolshinegroup/cosmiconfig-typescript-loader@^1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@endemolshinegroup/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-1.0.1.tgz#484ee6f4e9209ffde5d3edbdacf03e0bc5ee0c67"

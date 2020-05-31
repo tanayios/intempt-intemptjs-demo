@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Checkout from "../views/Checkout";
 
 Vue.use(VueRouter)
 
@@ -10,11 +9,6 @@ Vue.use(VueRouter)
     path: '/',
     name: 'Home',
     component: Home
-  },
-  {
-    path: '/checkout',
-    name: 'Checkout',
-    component: Checkout
   },
 ]
 

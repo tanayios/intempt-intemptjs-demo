@@ -5,7 +5,7 @@
         dark
         height="50"
     >
-        <img src="https://www.intempt.com/assets/images/intempt/Intempt_Whale_Logotype_Black@3x.png">
+        <img src="https://app.intempt.com/img/intempt_logo_white.0f3a5341.svg">
         <v-divider vertical></v-divider>
         <v-layout justify-space-between>
             <div>
@@ -25,10 +25,6 @@
                     </div>
                 </div>
             </v-card>
-            <div>
-                <font-awesome-icon class="icon" :icon="['fas', 'shopping-cart']"/>
-                <router-link to="/checkout">Checkout</router-link>
-            </div>
         </v-layout>
     </v-app-bar>
 </template>

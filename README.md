@@ -8,7 +8,7 @@
 
 3. Create an ```Intempt Web Tracker``` source
 
-4. Copy the tracker snippet and insert it into [index.html](/public/index.html)
+4. Copy the tracker snippet and insert it into [index.html](/public/index.html) - between `<!--Intempt Tracker Start-->` & `<!--Intempt Tracker End-->`
 
 5. See the results on the Intempt's console
 
@@ -40,18 +40,24 @@ Create `stripe_config.json` with the following contents:
 ```
 
 ## Development
-### Compiles and hot-reloads for development
+
+Run it on locally on your device using:
 ```
 yarn dev
 ```
 
+After the website is online, it will be found using the link below:
+
+```
+http://localhost:8080/
+```
+
 ## Deployment
-### Compiles and minifies for production
+
+Build for release using this:
+
 ```
 yarn build
 ```
 
-### Lints and fixes files
-```
-yarn lint
-```
+After the process is complete, your ready-for-release files will be found in the newly-created dist folder

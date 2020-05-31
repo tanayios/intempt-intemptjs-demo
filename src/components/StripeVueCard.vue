@@ -1,50 +1,68 @@
 <template>
-    <div id='app'>
-        <h1>Fill in your details below to complete the payment:</h1>
-        <card class='stripe-card'
-              :class='{ complete }'
-              stripe='pk_test_XXXXXXXXXXXXXXXXXXXXXXXX'
-              :options='stripeOptions'
-              @change='complete = $event.complete'
-        />
-        <button class='pay-with-stripe' @click='pay' :disabled='!complete'>Pay with credit card</button>
+    <div>
+        <stripe-elements
+                ref="elementsRef"
+                :pk="publishableKey"
+                :amount="amount"
+                locale="auto"
+                @token="tokenCreated"
+                @loading="loading = $event"
+        >
+        </stripe-elements>
     </div>
 </template>
 
 <script>
-    import { Card, createToken } from 'vue-stripe-elements-plus'
+    import { StripeElements } from 'vue-stripe-checkout';
+    import axios from 'axios';
+    import qs from 'querystring';
+    let stripeCharges = "https://api.stripe.com/v1/charges";
+    import { ContentType, Authorization } from "../../stripe_config.json";
 
     export default {
-        data () {
-            return {
-                complete: false,
-                stripeOptions: {
-                    // see https://stripe.com/docs/stripe.js#element-options for details
-                }
-            }
+        components: {
+            StripeElements
         },
-
-        components: { Card },
-
+        data: () => ({
+            loading: false,
+            amount: 1000,
+            publishableKey: "pk_test_ljAFYrnnGBQFZKlS3RfRsHXo00O5vWWmBk",
+            token: null,
+            description: null,
+            charge: null,
+            currency: 'eur'
+        }),
         methods: {
-            pay () {
-                // createToken returns a Promise which resolves in a result object with
-                // either a token or an error key.
-                // See https://stripe.com/docs/api#tokens for the token object.
-                // See https://stripe.com/docs/api#errors for the error object.
-                // More general https://stripe.com/docs/stripe.js#stripe-create-token.
-                createToken().then(data => console.log(data.token))
+            submit () {
+                this.$refs.elementsRef.submit();
+            },
+            tokenCreated (token) {
+                this.token = token;
+                // for additional charge objects go to https://stripe.com/docs/api/charges/object
+                this.charge = {
+                    source: token.id,
+                    amount: this.amount, // the amount you want to charge the customer in cents. $100 is 1000 (it is strongly recommended you use a product id and quantity and get calculate this on the backend to avoid people manipulating the cost)
+                    description: this.description, // optional description that will show up on stripe when looking at payments
+                    currency: this.currency
+                }
+                this.sendTokenToServer(this.charge);
+            },
+            sendTokenToServer (charge) {
+                const stripeAuthHeader = {
+                    "Content-Type": ContentType,
+                    "Authorization": Authorization
+                };
+                let data  = {
+                    source: charge.source,
+                    amount: charge.amount,
+                    description: charge.description,
+                    currency: charge.currency
+                };
+                axios.post(stripeCharges, qs.stringify(data), {
+                    headers: stripeAuthHeader
+                })
+                console.log(data)
             }
         }
     }
 </script>
-
-<style>
-    .stripe-card {
-        width: 300px;
-        border: 1px solid grey;
-    }
-    .stripe-card.complete {
-        border-color: green;
-    }
-</style>

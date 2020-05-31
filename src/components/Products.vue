@@ -15,49 +15,64 @@
             <v-spacer></v-spacer>
             <v-divider></v-divider>
             <v-card-actions class="justify-center">
-                <v-select
-                        label="Guests"
-                        :items="[1,2,3,4,5,6]"
-                >
-                </v-select>
-                <v-layout row wrap>
-                    <v-menu
-                            v-model="fromDateMenu"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-text-field
-                                    :label="todayDate"
-                                    readonly
-                                    :value="fromDateDisplay"
-                                    v-on="on"
-                                    height="50"
-                            ></v-text-field>
-                        </template>
-                        <v-date-picker
-                                show-current
-                                v-model="fromDateVal"
-                                no-title
-                                @input="fromDateMenu = false"
-                        ></v-date-picker>
-                    </v-menu>
-                </v-layout>
                 <v-btn
-                        color="primary"
-                        @click="setProduct(product.id)"
-                        :disabled="!$auth.isAuthenticated"
-                >
-                    Book Now
+                            color="primary"
+                            @click="setProduct(product.id)"
+                            :disabled="!$auth.isAuthenticated"
+                            :retain-focus="false"
+                    >
+                        Book Now
                 </v-btn>
             </v-card-actions>
         </v-card>
+
+        <v-dialog
+                v-model="bookingDialog"
+                width="500"
+        >
+            <v-card>
+                <v-card-title
+                        class="headline grey lighten-2 justify-center"
+                        primary-title
+                >
+                    Book the {{ bookingItemName }}
+                </v-card-title>
+
+                <v-card-text>
+                    {{ bookingItemDesc }}
+                </v-card-text>
+
+                <StripeVueCard></StripeVueCard>
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                            class="justify-lg-end"
+                            color="primary"
+                            text
+                            @click="pay"
+                    >
+                        Book Now
+                    </v-btn>
+                    <v-btn
+                            color="error"
+                            text
+                            @click="bookingDialog = false"
+                    >
+                        Cancel
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
     import axios from 'axios';
+    import StripeVueCard from "./StripeVueCard";
+
     // Import the Stripe configuration
     import { ContentType, Authorization } from "../../stripe_config.json";
     const stripeProducts = "https://api.stripe.com/v1/products"
@@ -68,12 +83,16 @@
     }
     export default {
         name: "Products.vue",
+        components: {
+            StripeVueCard
+        },
         data() {
             return {
                 products: [],
-                addedToCart: [],
-                fromDateMenu: false,
-                fromDateVal: null,
+                bookingDialog: false,
+                bookingItemName: null,
+                bookingItemDesc: null,
+                bookingItemPrice: null,
             }
         },
         mounted() {
@@ -107,8 +126,11 @@
             });
         },
         methods: {
-            // Intempt - Set product on "Add to Cart" click
+            // Intempt - Set product on "Book Now" click
             setProduct: function(id) {
+                if (!this.bookingDialog) {
+                    this.bookingDialog = true
+                }
                 for (let i = 0; i < this.products.length; i++) {
                     if (id == this.products[i].id) {
                         window.clients_product = {
@@ -116,18 +138,11 @@
                             property1: this.products[i].description,
                             property2: this.products[i].id
                         };
-                        console.log(window.clients_product)
+                        console.log(window.clients_product.name)
                     }
                 }
-            }
-        },
-        computed: {
-            todayDate() {
-                let todayDate = new Date()
-                return todayDate.getFullYear() + "-" + todayDate.getMonth() + "-" + todayDate.getDay()
-            },
-            fromDateDisplay() {
-                return this.fromDateVal;
+                this.bookingItemName = window.clients_product.name
+                this.bookingItemDesc = window.clients_product.property1
             }
         },
     }
