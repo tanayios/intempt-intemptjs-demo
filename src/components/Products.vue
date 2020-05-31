@@ -7,7 +7,16 @@
         >
             <img class="product-image" :src="product.images">
             <v-card-title class="product-title">{{product.name}}</v-card-title>
-            <v-card-subtitle class="product-subtitle">{{product.description}}</v-card-subtitle>
+            <v-row>
+                <v-col class="pa-0">
+                    <v-card-subtitle class="product-subtitle">{{product.description}}</v-card-subtitle>
+                </v-col>
+                <v-col class="pa-0" md="3">
+                    <span class="product-price">€10</span>
+                    <br/>
+                    <span class="product-unit"> per night</span>
+                </v-col>
+            </v-row>
             <v-card-text class="product-address">
                 <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" style="margin-right: 5px"/>
                 {{product.metadata.address}}
@@ -35,7 +44,7 @@
                         class="headline grey lighten-2 justify-center"
                         primary-title
                 >
-                    Book the {{ bookingItemName }}
+                    {{ bookingItemName }}
                 </v-card-title>
 
                 <v-card-text>
@@ -52,7 +61,6 @@
                             class="justify-lg-end"
                             color="primary"
                             text
-                            @click="pay"
                     >
                         Book Now
                     </v-btn>
@@ -151,7 +159,7 @@
 <style scoped>
     .product {
         width: 350px;
-        max-height: 400px;
+        max-height: 430px;
         display: inline-block;
         justify-content: center;
         margin-left: 23px;
@@ -160,11 +168,18 @@
         width: 350px;
         max-height: 200px;
     }
-    .product-title {
-    }
     .product-subtitle {
         text-transform: uppercase;
         color: #3C49C3 !important;
         font-size: 10px !important;
+    }
+    .product-price {
+        background-color: lightcoral;
+        border-radius: 2px;
+        padding: 5px 5px 5px 5px;
+        font-size: 16px;
+    }
+    .product-unit {
+        font-size: 13px;
     }
 </style>

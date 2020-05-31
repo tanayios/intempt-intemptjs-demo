@@ -8,6 +8,9 @@
                 @token="tokenCreated"
                 @loading="loading = $event"
         >
+            <template slot="payment-form">
+                <input id="name" name="name" placeholder="Jenny Rosen" required>
+            </template>
         </stripe-elements>
     </div>
 </template>
