@@ -9,12 +9,6 @@
                 @loading="loading = $event"
         >
 
-
-            <template slot="ideal-bank-element">
-
-            </template>
-
-
         </stripe-elements>
     </div>
 </template>
@@ -73,8 +67,21 @@
                 };
                 axios.post(stripeCharges, qs.stringify(data), {
                     headers: stripeAuthHeader
+                }).then(response => {
+                    console.log(response)
+
+                    // Intempt Custom Track - (Purchase Complete) on Axios Post Success
+                    let intempt = window._Intempt.clients["100393177026797568"]
+                    intempt.track("purchase-complete", {
+                        "items": charge.description,
+                        "totalprice": charge.amount,
+                        "ispaid": true,
+                        "timestamp": new Date().getTime(),
+                        "intempt.visit.trackcharge": charge.amount
+                    })
+                    console.log(intempt)
+
                 })
-                console.log(data)
             }
         }
     }

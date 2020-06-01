@@ -33,6 +33,12 @@
             // Log the user in
             login() {
                 this.$auth.loginWithRedirect();
+
+                // Intempt identify user on login
+                let intempt = window._Intempt.clients["100393177026797568"];
+                intempt.identify({'auth0-id' : this.$auth.user.id});
+                console.log(intempt)
+
             },
             // Log the user out
             logout() {
