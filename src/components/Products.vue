@@ -58,13 +58,6 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                            class="justify-lg-end"
-                            color="primary"
-                            text
-                    >
-                        Book Now
-                    </v-btn>
-                    <v-btn
                             color="error"
                             text
                             @click="bookingDialog = false"

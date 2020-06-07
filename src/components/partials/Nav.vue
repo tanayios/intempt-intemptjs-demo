@@ -35,8 +35,8 @@
                 this.$auth.loginWithRedirect();
 
                 // Intempt identify user on login
-                let intempt = window._Intempt.clients["100393177026797568"];
-                intempt.identify({'auth0-id' : this.$auth.user.id});
+                let intempt = window._Intempt.clients["102870408487632896"];
+                intempt.identify({'identifier' : this.$auth.user.id});
                 console.log(intempt)
 
             },

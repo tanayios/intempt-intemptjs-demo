@@ -71,16 +71,12 @@
                     console.log(response)
 
                     // Intempt Custom Track - (Purchase Complete) on Axios Post Success
-                    let intempt = window._Intempt.clients["100393177026797568"]
-                    intempt.track("purchase-complete", {
-                        "items": charge.description,
-                        "totalprice": charge.amount,
-                        "ispaid": true,
-                        "timestamp": new Date().getTime(),
-                        "intempt.visit.trackcharge": charge.amount
+                    let intempt = window._Intempt.clients["102870408487632896"]
+                    intempt.track("hotel-booking", {
+                        "hotelRoomName": charge.description,
+                        "roomPrice": charge.amount,
                     })
                     console.log(intempt)
-
                 })
             }
         }
