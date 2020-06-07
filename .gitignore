@@ -19,7 +19,3 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
-
-# Config files
-auth_config.json
-stripe_config.json
