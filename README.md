@@ -4,7 +4,7 @@
 
 1. Create an account on [Intempt's Console](https://app.intempt.com/)
 
-2. Head to Customer Data Platform -> Sources
+2. Head to Data -> Sources
 
 3. Create an ```Intempt Web Tracker``` source
 
