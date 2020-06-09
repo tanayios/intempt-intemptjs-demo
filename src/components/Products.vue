@@ -2,7 +2,7 @@
     <div>
         <v-card
                 class="product"
-                v-for="product in products"
+                v-for="product in productsFinal"
                 :key="product.id"
         >
             <img class="product-image" :src="product.images">
@@ -12,14 +12,14 @@
                     <v-card-subtitle class="product-subtitle">{{product.description}}</v-card-subtitle>
                 </v-col>
                 <v-col class="pa-0" md="3">
-                    <span class="product-price">€10</span>
+                    <span class="product-price">${{ product.unit_amount / 100 }}</span>
                     <br/>
                     <span class="product-unit"> per night</span>
                 </v-col>
             </v-row>
             <v-card-text class="product-address">
                 <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" style="margin-right: 5px"/>
-                {{product.metadata.address}}
+                {{product.address}}
             </v-card-text>
             <v-spacer></v-spacer>
             <v-divider></v-divider>
@@ -48,14 +48,23 @@
                 </v-card-title>
 
                 <v-card-text>
-                    {{ bookingItemDesc }}
+                    {{ bookingItemPrice / 100 }}
                 </v-card-text>
 
-                <StripeVueCard></StripeVueCard>
+                <StripeElements
+                        ref="elementsRef"
+                        :pk="publishableKey"
+                        :amount="amount"
+                        locale="auto"
+                        @token="tokenCreated"
+                        @loading="loading = $event"
+                >
+
+                </StripeElements>
 
                 <v-divider></v-divider>
 
-                <v-card-actions>
+                <v-card-actions class="justify-space-between">
                     <v-spacer></v-spacer>
                     <v-btn
                             color="error"
@@ -64,6 +73,13 @@
                     >
                         Cancel
                     </v-btn>
+                    <v-btn
+                            color="primary"
+                            text
+                            @click="submit"
+                    >
+                        Book
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -71,13 +87,18 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import StripeVueCard from "./StripeVueCard";
-
-    // Import the Stripe configuration
+    // Import the dependencies
     import { ContentType, Authorization } from "../../stripe_config.json";
+    import { StripeElements } from 'vue-stripe-checkout';
+    import axios from 'axios';
+    import qs from 'querystring';
     const stripeProducts = "https://api.stripe.com/v1/products"
-    let stripePrices = "https://api.stripe.com/v1/prices"
+    const stripePrices = "https://api.stripe.com/v1/prices"
+    const stripeCharges = "https://api.stripe.com/v1/charges";
+    // Intempt Source ID Start
+    const intemptSourceId = "103165180146221056"
+    // Intempt Source ID End
+
     const stripeAuthHeader = {
         'Content-Type': ContentType,
         'Authorization': Authorization,
@@ -85,14 +106,24 @@
     export default {
         name: "Products.vue",
         components: {
-            StripeVueCard
+            StripeElements
         },
         data() {
             return {
+                // Payment Variables
+                loading: false,
+                amount: 1000,
+                publishableKey: "pk_test_ljAFYrnnGBQFZKlS3RfRsHXo00O5vWWmBk",
+                token: null,
+                description: null,
+                charge: null,
+                currency: 'eur',
+
                 products: [],
+                prices: [],
+                productsFinal: [],
                 bookingDialog: false,
                 bookingItemName: null,
-                bookingItemDesc: null,
                 bookingItemPrice: null,
             }
         },
@@ -100,18 +131,6 @@
             // Intempt - Set category
             window.clients_category = 'Luxury Hotel Rooms';
             console.log(window.clients_category)
-
-            console.log(this.products)
-
-            for (let i = 0; i < this.products.length; i++) {
-                console.log("ok")
-                for (let k = 0; k < this.prices.length; k++) {
-                    console.log("ok")
-                    if (this.products[i].id === this.prices[k].product) {
-                        console.log("id")
-                    }
-                }
-            }
         },
         beforeMount() {
             axios.get(stripeProducts, {
@@ -124,6 +143,18 @@
                 headers: stripeAuthHeader
             }).then(response => {
                 this.prices = response.data.data
+
+                const plansMerge = [...this.products.map((item, i) => {
+                    return {
+                        ...item,
+                        ...item.metadata,
+                        ...this.prices[i]
+                    };
+                })];
+                this.productsFinal = plansMerge.filter(function (el) {
+                    return el.active === true
+                });
+                console.log(this.productsFinal)
             });
         },
         methods: {
@@ -132,18 +163,63 @@
                 if (!this.bookingDialog) {
                     this.bookingDialog = true
                 }
-                for (let i = 0; i < this.products.length; i++) {
-                    if (id == this.products[i].id) {
+                for (let i = 0; i < this.productsFinal.length; i++) {
+                    if (id == this.productsFinal[i].id) {
                         window.clients_product = {
-                            name: this.products[i].name,
-                            property1: this.products[i].description,
-                            property2: this.products[i].id
+                            name: this.productsFinal[i].name,
+                            property1: this.productsFinal[i].unit_amount,
+                            property2: this.productsFinal[i].id
                         };
-                        console.log(window.clients_product.name)
+                        console.log(window.clients_product)
                     }
                 }
                 this.bookingItemName = window.clients_product.name
-                this.bookingItemDesc = window.clients_product.property1
+                this.bookingItemPrice = window.clients_product.property1
+            },
+            submit () {
+                this.$refs.elementsRef.submit();
+            },
+            tokenCreated (token) {
+                this.token = token;
+                // for additional charge objects go to https://stripe.com/docs/api/charges/object
+                this.charge = {
+                    source: token.id,
+                    amount: this.amount, // the amount you want to charge the customer in cents. $100 is 1000 (it is strongly recommended you use a product id and quantity and get calculate this on the backend to avoid people manipulating the cost)
+                    description: this.description, // optional description that will show up on stripe when looking at payments
+                    currency: this.currency
+                }
+                this.sendTokenToServer(this.charge);
+            },
+            sendTokenToServer (charge) {
+                const stripeAuthHeader = {
+                    "Content-Type": ContentType,
+                    "Authorization": Authorization
+                };
+                let data  = {
+                    source: charge.source,
+                    amount: charge.amount,
+                    description: charge.description,
+                    currency: charge.currency
+                };
+                axios.post(stripeCharges, qs.stringify(data), {
+                    headers: stripeAuthHeader
+                }).then(response => {
+                    console.log(response)
+                    // Intempt Custom Track - (Purchase Complete) on Axios Post Success
+                    const intempt = window._Intempt.clients[intemptSourceId]
+                    intempt.track("hotel-booking", {
+                        "hotelRoomName": charge.description,
+                        "roomPrice": charge.amount,
+                    })
+                    console.log(intempt)
+                }).catch(error => {
+                    console.log(error)
+                    const intempt = window._Intempt.clients[intemptSourceId]
+                    intempt.track("hotel-booking-fail", {
+                        "hotelRoomName": charge.description,
+                        "roomPrice": charge.amount,
+                    })
+                })
             }
         },
     }

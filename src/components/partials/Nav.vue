@@ -27,18 +27,21 @@
 </template>
 
 <script>
+    // Intempt Source ID Start
+    const intemptSourceId = "103165180146221056"
+    // Intempt Source ID End
     export default {
         name: 'Nav',
+        mounted() {
+            // Intempt identify user on page load if logged in
+            const intempt = window._Intempt.clients[intemptSourceId];
+            intempt.identify({'identifier' : this.$auth.user.id});
+            console.log(intempt)
+        },
         methods: {
             // Log the user in
             login() {
                 this.$auth.loginWithRedirect();
-
-                // Intempt identify user on login
-                let intempt = window._Intempt.clients["102870408487632896"];
-                intempt.identify({'identifier' : this.$auth.user.id});
-                console.log(intempt)
-
             },
             // Log the user out
             logout() {
