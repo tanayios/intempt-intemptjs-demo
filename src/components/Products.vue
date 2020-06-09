@@ -87,6 +87,10 @@
 </template>
 
 <script>
+    // Intempt Source ID Start
+    const intemptSourceId = "103165180146221056"
+    // Intempt Source ID End
+
     // Import the dependencies
     import { ContentType, Authorization } from "../../stripe_config.json";
     import { StripeElements } from 'vue-stripe-checkout';
@@ -95,9 +99,6 @@
     const stripeProducts = "https://api.stripe.com/v1/products"
     const stripePrices = "https://api.stripe.com/v1/prices"
     const stripeCharges = "https://api.stripe.com/v1/charges";
-    // Intempt Source ID Start
-    const intemptSourceId = "103165180146221056"
-    // Intempt Source ID End
 
     const stripeAuthHeader = {
         'Content-Type': ContentType,

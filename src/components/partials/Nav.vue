@@ -30,6 +30,7 @@
     // Intempt Source ID Start
     const intemptSourceId = "103165180146221056"
     // Intempt Source ID End
+
     export default {
         name: 'Nav',
         mounted() {
