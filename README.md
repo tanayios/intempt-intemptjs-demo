@@ -1,4 +1,4 @@
-# Intempt Demo - Book a Room
+# Intempt Demo - Book a Room - Website
 
 ## Setup Intempt
 
