@@ -36,7 +36,7 @@
         mounted() {
             // Intempt identify user on page load if logged in
             const intempt = window._Intempt.clients[intemptSourceId];
-            intempt.identify({'identifier' : this.$auth.user.id});
+            intempt.identify({'identifier' : this.$auth.user.email});
             console.log(intempt)
         },
         methods: {
