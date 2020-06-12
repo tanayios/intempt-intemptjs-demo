@@ -1,18 +1,18 @@
-# Intempt Demo - Book a Room
+# Intempt Demo - Book a Room - Website
 
 ## Setup Intempt
 
 1. Create an account on [Intempt's Console](https://app.intempt.com/)
 
-2. Head to Customer Data Platform -> Sources
+2. Head to Data -> Sources
 
 3. Create an ```Intempt Web Tracker``` source
 
 4. Copy the tracker snippet and insert it into [index.html](/public/index.html) - between `<!--Intempt Tracker Start-->` & `<!--Intempt Tracker End-->`
 
-6. Go to the [Products.vue](/src/components/Products.vue) & [Nav.vue](/src/components/partials/Nav.vue) replace the `intemptSourceId` variable with your own Source ID to begin tracking
+5. Go to the [Products.vue](/src/components/Products.vue) & [Nav.vue](/src/components/partials/Nav.vue) replace the `intemptSourceId` variable with your own Source ID to begin tracking
 
-5. See the results on Intempt's console
+6. See the results on Intempt's console
 
 **Bonus**:
 
