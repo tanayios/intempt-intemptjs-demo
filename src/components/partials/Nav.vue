@@ -89,6 +89,7 @@
                     "starsRated": this.rating
                 })
                 console.log(intempt)
+                this.ratingDialog = false
             }
         }
     }
