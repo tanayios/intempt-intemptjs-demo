@@ -44,17 +44,31 @@
                         class="headline grey lighten-2 justify-center"
                         primary-title
                 >
-                    {{ bookingItemName }}
+                    {{ selectedRoom.name }}
                 </v-card-title>
 
-                <v-card-text>
-                    {{ bookingItemPrice / 100 }}
+                <v-card-text class="text-center">
+                    {{ selectedRoom.description }}
                 </v-card-text>
+
+                <div class="image-center">
+                    <v-checkbox
+                            v-model="spa"
+                            label="Add full day Hotel SPA access"
+                            false-value="0"
+                            true-value="3000"
+                            @change="interestedSpa"
+                    >
+                    </v-checkbox>
+                    <img width="180" height="auto" src="../assets/images/spa.jpg" style="margin-left: 40px">
+                </div>
+
+                <br/>
 
                 <StripeElements
                         ref="elementsRef"
                         :pk="publishableKey"
-                        :amount="amount"
+                        :amount="selectedRoom.price"
                         locale="auto"
                         @token="tokenCreated"
                         @loading="loading = $event"
@@ -64,21 +78,14 @@
 
                 <v-divider></v-divider>
 
-                <v-card-actions class="justify-space-between">
+                <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn
-                            color="error"
-                            text
-                            @click="bookingDialog = false"
-                    >
-                        Cancel
-                    </v-btn>
                     <v-btn
                             color="primary"
                             text
                             @click="submit"
                     >
-                        Book
+                        Book for ${{ selectedRoom.price / 100}} <span v-if="spa === '3000'"> + ${{ spa / 100 }}</span>
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -113,10 +120,8 @@
             return {
                 // Payment Variables
                 loading: false,
-                amount: 1000,
                 publishableKey: "pk_test_ljAFYrnnGBQFZKlS3RfRsHXo00O5vWWmBk",
                 token: null,
-                description: null,
                 charge: null,
                 currency: 'eur',
 
@@ -124,8 +129,17 @@
                 prices: [],
                 productsFinal: [],
                 bookingDialog: false,
-                bookingItemName: null,
-                bookingItemPrice: null,
+
+                selectedRoom: {
+                    id: "",
+                    name: "",
+                    description: "",
+                    price: "",
+                    images: "",
+                },
+
+                spaInterest: false,
+                spa: "0",
             }
         },
         mounted() {
@@ -155,7 +169,6 @@
                 this.productsFinal = plansMerge.filter(function (el) {
                     return el.active === true
                 });
-                console.log(this.productsFinal)
             });
         },
         methods: {
@@ -166,32 +179,35 @@
                 }
                 for (let i = 0; i < this.productsFinal.length; i++) {
                     if (id == this.productsFinal[i].id) {
+                        this.selectedRoom.id = this.productsFinal[i].id
+                        this.selectedRoom.name = this.productsFinal[i].name
+                        this.selectedRoom.description = this.productsFinal[i].description
+                        this.selectedRoom.price = this.productsFinal[i].unit_amount
+                        this.selectedRoom.images = this.productsFinal[i].images
                         window.clients_product = {
-                            name: this.productsFinal[i].name,
-                            property1: this.productsFinal[i].unit_amount,
-                            property2: this.productsFinal[i].id
+                            name: this.selectedRoom.name,
+                            property1: this.selectedRoom.price,
+                            property2: this.selectedRoom.id
                         };
                         console.log(window.clients_product)
                     }
                 }
-                this.bookingItemName = window.clients_product.name
-                this.bookingItemPrice = window.clients_product.property1
             },
-            submit () {
+            submit: function() {
                 this.$refs.elementsRef.submit();
             },
-            tokenCreated (token) {
+            tokenCreated: function(token) {
                 this.token = token;
                 // for additional charge objects go to https://stripe.com/docs/api/charges/object
                 this.charge = {
                     source: token.id,
-                    amount: this.amount, // the amount you want to charge the customer in cents. $100 is 1000 (it is strongly recommended you use a product id and quantity and get calculate this on the backend to avoid people manipulating the cost)
-                    description: this.description, // optional description that will show up on stripe when looking at payments
+                    amount: this.selectedRoom.price + parseInt(this.spa), // the amount you want to charge the customer in cents. $100 is 1000 (it is strongly recommended you use a product id and quantity and get calculate this on the backend to avoid people manipulating the cost)
+                    description: this.selectedRoom.name, // optional description that will show up on stripe when looking at payments
                     currency: this.currency
                 }
                 this.sendTokenToServer(this.charge);
             },
-            sendTokenToServer (charge) {
+            sendTokenToServer: function(charge) {
                 const stripeAuthHeader = {
                     "Content-Type": ContentType,
                     "Authorization": Authorization
@@ -204,23 +220,36 @@
                 };
                 axios.post(stripeCharges, qs.stringify(data), {
                     headers: stripeAuthHeader
+                    // eslint-disable-next-line no-unused-vars
                 }).then(response => {
-                    console.log(response)
                     // Intempt Custom Track - (Purchase Complete) on Axios Post Success
                     const intempt = window._Intempt.clients[intemptSourceId]
                     intempt.track("hotel-booking", {
-                        "hotelRoomName": charge.description,
+                        "guestName": this.$auth.user.name,
+                        "guestEmail": this.$auth.user.email,
+                        "hotelRoomName": this.selectedRoom.name,
+                        "hotelRoomDesc": this.selectedRoom.description,
                         "roomPrice": charge.amount,
+                        "spaInterest": this.spaInterest,
+                        "spa": parseInt(this.spa),
                     })
                     console.log(intempt)
+                    // eslint-disable-next-line no-unused-vars
                 }).catch(error => {
-                    console.log(error)
                     const intempt = window._Intempt.clients[intemptSourceId]
                     intempt.track("hotel-booking-fail", {
-                        "hotelRoomName": charge.description,
+                        "guestName": this.$auth.user.name,
+                        "guestEmail": this.$auth.user.email,
+                        "hotelRoomName": this.selectedRoom.name,
+                        "hotelRoomDesc": this.selectedRoom.description,
                         "roomPrice": charge.amount,
+                        "spaInterest": this.spaInterest,
+                        "spa": parseInt(this.spa),
                     })
                 })
+            },
+            interestedSpa: function() {
+                this.spaInterest = true
             }
         },
     }
@@ -251,5 +280,10 @@
     }
     .product-unit {
         font-size: 13px;
+    }
+    .image-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

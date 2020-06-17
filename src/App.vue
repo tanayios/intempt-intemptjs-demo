@@ -8,18 +8,29 @@
 </template>
 
 <script>
-import Nav from './components/partials/Nav.vue';
+  // Intempt Source ID Start
+  const intemptSourceId = "103165180146221056"
+  // Intempt Source ID End
 
-export default {
-  name: 'App',
+  import Nav from './components/partials/Nav.vue';
 
-  components: {
-    Nav,
-  },
-  data: () => ({
-    //
-  }),
-};
+  export default {
+    name: 'App',
+
+    components: {
+      Nav,
+    },
+    data: () => ({
+      //
+    }),
+
+    mounted() {
+      // Intempt identify user on page load if logged in
+      const intempt = window._Intempt.clients[intemptSourceId];
+      intempt.identify({'identifier' : this.$auth.user.email});
+      console.log(intempt)
+    },
+  };
 </script>
 
 <style>
